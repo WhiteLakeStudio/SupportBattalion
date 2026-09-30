@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Батальйон підтримки 15-ї оперативної бригади</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
+    font-family:"Segoe UI",Arial,sans-serif;
+}
+
+body{
+    position:relative;
+}
+
+/* ================= VIDEO ================= */
+
+#bgVideo{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    z-index:-3;
+}
+
+/* ================= OVERLAY ================= */
+
+.overlay{
+    position:fixed;
+    inset:0;
+    z-index:-2;
+
+    background:
+    linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.35),
+        rgba(0,0,0,0.45)
+    );
+}
+
+/* ================= CONTENT ================= */
+
+.content{
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+
+    color:white;
+
+    padding:20px;
+}
+
+/* ================= TITLE ================= */
+
+.title{
+    text-transform:uppercase;
+
+    font-weight:800;
+
+    line-height:1.1;
+
+    letter-spacing:0.08em;
+
+    font-size:
+    clamp(
+        1.5rem,
+        3vw,
+        3rem
+    );
+
+    text-shadow:
+        0 0 25px rgba(0,0,0,.9),
+        0 0 50px rgba(0,0,0,.7);
+
+    margin-bottom:28px;
+}
+
+/* ================= LOGO ================= */
+
+.logo{
+    width:min(22vw,220px);
+    max-width:220px;
+    min-width:120px;
+
+    filter:
+        drop-shadow(0 0 20px rgba(0,0,0,.8))
+        drop-shadow(0 0 50px rgba(0,0,0,.5));
+
+    margin-bottom:30px;
+}
+
+/* ================= CLOCK ================= */
+
+.clock{
+    font-size:
+    clamp(
+        2.8rem,
+        7vw,
+        6rem
+    );
+
+    font-weight:300;
+
+    letter-spacing:0.08em;
+
+    text-shadow:
+        0 0 25px rgba(0,0,0,.9);
+
+    margin-bottom:14px;
+
+    font-variant-numeric:
+        tabular-nums;
+}
+
+/* ================= DATE ================= */
+
+.date{
+    font-size:
+    clamp(
+        0.9rem,
+        2vw,
+        1.4rem
+    );
+
+    opacity:.95;
+
+    letter-spacing:.08em;
+
+    margin-bottom:30px;
+
+    text-shadow:
+        0 0 20px rgba(0,0,0,.8);
+}
+
+/* ================= DAYS ================= */
+
+.days-card{
+
+    background:
+    rgba(0,0,0,.35);
+
+    backdrop-filter:
+    blur(12px);
+
+    -webkit-backdrop-filter:
+    blur(12px);
+
+    border:
+    1px solid rgba(255,255,255,.15);
+
+    border-radius:24px;
+
+    padding:
+    22px
+    36px;
+
+    box-shadow:
+    0 10px 40px rgba(0,0,0,.45);
+}
+
+.days-title{
+    text-transform:uppercase;
+
+    letter-spacing:.12em;
+
+    opacity:.9;
+
+    font-size:
+    clamp(
+        .8rem,
+        1.6vw,
+        1rem
+    );
+
+    margin-bottom:10px;
+}
+
+.days-number{
+    font-size:
+    clamp(
+        2.5rem,
+        6vw,
+        5rem
+    );
+
+    font-weight:700;
+
+    line-height:1;
+
+    margin-bottom:10px;
+}
+
+.days-sub{
+    opacity:.8;
+    font-size:.95rem;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width:768px){
+
+    .title{
+        margin-bottom:20px;
+    }
+
+    .logo{
+        margin-bottom:22px;
+    }
+
+    .clock{
+        margin-bottom:10px;
+    }
+
+    .date{
+        margin-bottom:22px;
+    }
+
+    .days-card{
+        padding:18px 22px;
+    }
+}
+</style>
+</head>
+<body>
+
+<video
+    id="bgVideo"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto">
+    <source src="media/flag_loop_animation_V2.mp4" type="video/mp4">
+    Ваш браузер не підтримує відео.
+</video>
+
+<div class="overlay"></div>
+
+<div class="content">
+
+    <div class="title">
+        БАТАЛЬЙОН ПІДТРИМКИ<br>
+        15-Ї ОПЕРАТИВНОЇ БРИГАДИ
+    </div>
+
+    <img
+        src="media/logo.png"
+        class="logo"
+        alt="Логотип">
+
+    <div
+        class="clock"
+        id="clock">
+        00:00:00
+    </div>
+
+    <div
+        class="date"
+        id="date">
+    </div>
+
+    <div class="days-card">
+
+        <div class="days-title">
+            ДНІВ ПОВНОМАСШТАБНОЇ ВІЙНИ
+        </div>
+
+        <div
+            class="days-number"
+            id="days">
+            0
+        </div>
+
+        <div class="days-sub">
+            з 24 лютого 2022 року
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const clockEl =
+document.getElementById("clock");
+
+const dateEl =
+document.getElementById("date");
+
+const daysEl =
+document.getElementById("days");
+
+const weekdays = [
+"неділя",
+"понеділок",
+"вівторок",
+"середа",
+"четвер",
+"п’ятниця",
+"субота"
+];
+
+const months = [
+"січня",
+"лютого",
+"березня",
+"квітня",
+"травня",
+"червня",
+"липня",
+"серпня",
+"вересня",
+"жовтня",
+"листопада",
+"грудня"
+];
+
+const warStart =
+new Date(
+"2022-02-24T00:00:00+02:00"
+);
+
+function updateClock(){
+
+    const now =
+    new Date();
+
+    clockEl.textContent =
+        String(now.getHours()).padStart(2,"0")
+        + ":" +
+        String(now.getMinutes()).padStart(2,"0")
+        + ":" +
+        String(now.getSeconds()).padStart(2,"0");
+
+    dateEl.textContent =
+        weekdays[now.getDay()]
+        + ", "
+        + now.getDate()
+        + " "
+        + months[now.getMonth()]
+        + " "
+        + now.getFullYear();
+
+    const days =
+    Math.floor(
+        (now - warStart)
+        /
+        86400000
+    );
+
+    daysEl.textContent =
+    days.toLocaleString("uk-UA");
+}
+
+updateClock();
+setInterval(updateClock,1000);
+
+/* страховка для autoplay */
+
+const video =
+document.getElementById("bgVideo");
+
+video.play().catch(()=>{
+    console.log("Autoplay blocked");
+});
+
+</script>
+
+</body>
+</html>
