@@ -388,6 +388,27 @@ video.play().catch(()=>{
     console.log("Autoplay blocked");
 });
 
+    /* Примусовий запуск відео на випадок блокування браузером */
+window.addEventListener("DOMContentLoaded", () => {
+    const video = document.getElementById("bgVideo");
+    if (video) {
+        video.muted = true; // На всякий випадок дублюємо програмно
+        video.play().catch(error => {
+            console.log("Автозапуск заблоковано браузером, очікуємо взаємодії:", error);
+            
+            // Якщо браузер жорстко заблокував автозапуск, воно запуститься від першого кліку/дотику
+            const resumeVideo = () => {
+                video.play();
+                window.removeEventListener("click", resumeVideo);
+                window.removeEventListener("touchstart", resumeVideo);
+            };
+            window.addEventListener("click", resumeVideo);
+            window.addEventListener("touchstart", resumeVideo);
+        });
+    }
+});
+    
+
 </script>
 
 </body>
